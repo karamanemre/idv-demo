@@ -5,6 +5,7 @@ import com.idv.demo.models.enums.ApplicationStatus;
 import com.idv.demo.models.enums.PassportStatus;
 import com.idv.demo.services.ConfirmationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/confirmation")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('IK', 'ADMIN')")
 public class ConfirmationController {
 
     private final ConfirmationService confirmationService;

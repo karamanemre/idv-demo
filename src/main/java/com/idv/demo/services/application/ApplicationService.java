@@ -3,7 +3,6 @@ package com.idv.demo.services.application;
 import com.idv.demo.entities.application.ApplicationsEntity;
 import com.idv.demo.entities.CountryEntity;
 import com.idv.demo.exception.BadRequestException;
-import com.idv.demo.mapper.ApplicationMapper;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationBaseRequest;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationGetResponse;
 import com.idv.demo.models.enums.ApplicationStatus;
@@ -18,12 +17,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ApplicationService {
+public class ApplicationService extends ApplicationConverter {
 
     private final ApplicationRepository applicationRepository;
     private final CountryService countryService;
     private final Map<String, ApplicationFactory> instances;
-    private final ApplicationMapper applicationMapper;
 
     public void create(ApplicationBaseRequest request) {
         CountryEntity country = countryService.getCountryByCode(request.getDestinationCountryCode());
@@ -40,7 +38,7 @@ public class ApplicationService {
 
     public List<ApplicationGetResponse> getApplications(String search) {
         List<ApplicationsEntity> entities = this.applicationRepository.findByFilters(ApplicationStatus.PENDING, search);
-        return this.applicationMapper.toDto(entities);
+        return this.toResponse(entities);
     }
 
     private ApplicationFactory getInstance(ApplicationTypes type) {

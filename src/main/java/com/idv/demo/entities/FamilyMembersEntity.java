@@ -37,12 +37,12 @@ public class FamilyMembersEntity {
     @Column(name = "surname")
     private String lastname;
 
-    @Column(name = "identityNumber")
+    @Column(name = "identity_number")
     private String identityNumber;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "familyMemberType")
-    private FamilyMemberTypes familyMemberType;
+    @Column(name = "family_member_type")
+    private FamilyMemberTypes type;
 
     @ManyToOne
     @JoinColumn(name = "application_id")

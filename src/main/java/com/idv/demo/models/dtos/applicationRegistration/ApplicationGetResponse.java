@@ -20,7 +20,7 @@ public class ApplicationGetResponse {
     private String name;
     private String lastname;
     private String identityNumber;
-    private String countryId;
+    private Integer countryId;
     private String countryName;
     private String countryCode;
     private ApplicationStatus status;

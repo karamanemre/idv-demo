@@ -3,7 +3,6 @@ package com.idv.demo.services.application;
 import com.idv.demo.entities.CountryEntity;
 import com.idv.demo.entities.FamilyMembersEntity;
 import com.idv.demo.entities.application.ApplicationsActiveWorkerEntity;
-import com.idv.demo.mapper.ApplicationMapper;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationActiveWorkerRequest;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationBaseRequest;
 import com.idv.demo.models.dtos.applicationRegistration.FamilyMemberRequest;
@@ -20,9 +19,8 @@ import org.springframework.stereotype.Service;
 
 @Service("ApplicationActiveWorkerService")
 @RequiredArgsConstructor
-public class ApplicationActiveWorkerService implements ApplicationFactory {
+public class ApplicationActiveWorkerService extends ApplicationConverter implements ApplicationFactory {
 
-    private final ApplicationMapper mapper;
     private final ApplicationActiveWorkerRepository repository;
     private final FamilyMemberRepository familyMemberRepository;
     private final LogService logService;
@@ -32,36 +30,13 @@ public class ApplicationActiveWorkerService implements ApplicationFactory {
         ApplicationActiveWorkerRequest activeWorkerRequest = (ApplicationActiveWorkerRequest) request;
 
         try {
-            ApplicationsActiveWorkerEntity savedValue = this.saveDb(activeWorkerRequest, country);
+            ApplicationsActiveWorkerEntity entity = this.toEntity(activeWorkerRequest, country, ApplicationStatus.PENDING);
+            ApplicationsActiveWorkerEntity savedValue = this.repository.save(entity);
             List<FamilyMembersEntity> familyMembersEntities = this.getFamilyMember(activeWorkerRequest.getFamilies(), savedValue);
             this.familyMemberRepository.saveAll(familyMembersEntities);
         } catch (Exception e) {
             LogConsole.error("An error occurred while creating ApplicationActiveWorker detail: ", e.getMessage());
             this.logService.error(e, ApplicationActiveWorkerService.class);
         }
-    }
-
-    private ApplicationsActiveWorkerEntity saveDb(ApplicationActiveWorkerRequest request, CountryEntity country) {
-        ApplicationsActiveWorkerEntity entity = this.mapper.toEntity(request);
-        entity.setCountry(country);
-        entity.setStatus(ApplicationStatus.PENDING);
-        return this.repository.save(entity);
-    }
-
-    private List<FamilyMembersEntity> getFamilyMember(List<FamilyMemberRequest> familyMembers, ApplicationsActiveWorkerEntity applications) {
-        if (familyMembers == null) {
-            return Arrays.asList();
-        }
-
-        return familyMembers
-                .stream()
-                .map(familyMember -> FamilyMembersEntity.builder()
-                        .application(applications)
-                        .familyMemberType(familyMember.getType())
-                        .name(familyMember.getName())
-                        .lastname(familyMember.getLastname())
-                        .identityNumber(familyMember.getIdentityNumber())
-                        .build())
-                .collect(Collectors.toList());
     }
 }

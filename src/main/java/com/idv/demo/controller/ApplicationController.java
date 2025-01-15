@@ -7,6 +7,7 @@ import com.idv.demo.services.application.ApplicationService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ public class ApplicationController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('IK', 'ADMIN')")
     public List<ApplicationGetResponse> getApplications(@RequestParam(required = false) String search) {
         return this.applicationService.getApplications(search);
     }
