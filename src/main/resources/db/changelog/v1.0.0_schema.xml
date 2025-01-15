@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="15-05-2025_create-country-entity" author="emrek">
+        <createTable tableName="country_entity">
+            <column name="id" type="INT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="code" type="VARCHAR(10)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-applications" author="emrek">
+        <createTable tableName="applications">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="lastname" type="VARCHAR(255)"/>
+            <column name="identity_number" type="VARCHAR(20)"/>
+            <column name="country_id" type="INT"/>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="modified_by" type="VARCHAR(255)"/>
+            <column name="modified_date" type="TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="applications" baseColumnNames="country_id"
+                                 referencedTableName="country_entity" referencedColumnNames="id"
+                                 constraintName="application_country_fk"/>
+        <createIndex tableName="applications"
+                     indexName="idx_applications_identity_number">
+            <column name="identity_number"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-application-active-worker" author="emrek">
+        <createTable tableName="application_active_worker">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="duty_start_date" type="TIMESTAMP"/>
+            <column name="duty_end_date" type="TIMESTAMP"/>
+            <column name="duty_title" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-application-retired-worker" author="emrek">
+        <createTable tableName="application_retired_worker">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="last_duty_title" type="VARCHAR(255)"/>
+            <column name="reason_desc" type="VARCHAR(500)"/>
+            <column name="reason_date" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-family-members" author="emrek">
+        <createTable tableName="family_members">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="surname" type="VARCHAR(255)"/>
+            <column name="identityNumber" type="VARCHAR(20)"/>
+            <column name="familyMemberType" type="VARCHAR(50)"/>
+            <column name="application_id" type="UUID"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="family_members" baseColumnNames="application_id"
+                                 referencedTableName="application_active_worker" referencedColumnNames="id"
+                                 constraintName="family_application_fk"/>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-files" author="emrek">
+        <createTable tableName="files">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="remote_file_id" type="VARCHAR(255)"/>
+            <column name="owner_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-logs" author="emrek">
+        <createTable tableName="logs">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="payload" type="TEXT"/>
+            <column name="user_name" type="VARCHAR(255)"/>
+            <column name="request_method" type="VARCHAR(50)"/>
+            <column name="request_uri" type="VARCHAR(255)"/>
+            <column name="class_name" type="VARCHAR(255)"/>
+            <column name="timestamp" type="TIMESTAMP"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="log_level" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="15-05-2025_create-passport-table" author="emrek">
+        <createTable tableName="passport">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="application_id" type="UUID">
+                <constraints nullable="true"
+                             foreignKeyName="fk_passport_application"
+                             references="applications(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-denied-passport-table" author="emrek">
+        <createTable tableName="denied_passport">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"
+                             foreignKeyName="fk_denied_passport_passport"
+                             references="passport(id)"/>
+            </column>
+            <column name="desc" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-deserve-passport-table" author="emrek">
+        <createTable tableName="deserve_passport">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"
+                             foreignKeyName="fk_deserve_passport_passport"
+                             references="passport(id)"/>
+            </column>
+            <column name="expiry_date" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15-05-2025_create-users-table" author="emrek">
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="roles" type="VARCHAR(500)"/>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp without time zone" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

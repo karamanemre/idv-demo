@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="14-01-2025_country_data_insert" author="emrek">
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="United States"/>
+            <column name="code" value="US"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="China"/>
+            <column name="code" value="CN"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="India"/>
+            <column name="code" value="IN"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="Japan"/>
+            <column name="code" value="JP"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="5"/>
+            <column name="name" value="Germany"/>
+            <column name="code" value="DE"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="6"/>
+            <column name="name" value="United Kingdom"/>
+            <column name="code" value="GB"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="7"/>
+            <column name="name" value="France"/>
+            <column name="code" value="FR"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="8"/>
+            <column name="name" value="Turkey"/>
+            <column name="code" value="TR"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="9"/>
+            <column name="name" value="Italy"/>
+            <column name="code" value="IT"/>
+        </insert>
+        <insert tableName="country_entity">
+            <column name="id" valueNumeric="10"/>
+            <column name="name" value="Canada"/>
+            <column name="code" value="CA"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
