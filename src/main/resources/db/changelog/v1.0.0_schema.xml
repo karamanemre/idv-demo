@@ -47,6 +47,12 @@
             <column name="duty_end_date" type="TIMESTAMP"/>
             <column name="duty_title" type="VARCHAR(255)"/>
         </createTable>
+        <addForeignKeyConstraint
+                baseTableName="application_active_worker"
+                baseColumnNames="id"
+                referencedTableName="applications"
+                referencedColumnNames="id"
+                constraintName="fk_retired_worker_application"/>
     </changeSet>
 
     <changeSet id="15-05-2025_create-application-retired-worker" author="emrek">
@@ -58,6 +64,12 @@
             <column name="reason_desc" type="VARCHAR(500)"/>
             <column name="reason_date" type="TIMESTAMP"/>
         </createTable>
+        <addForeignKeyConstraint
+                baseTableName="application_retired_worker"
+                baseColumnNames="id"
+                referencedTableName="applications"
+                referencedColumnNames="id"
+                constraintName="fk_retired_worker_application"/>
     </changeSet>
 
     <changeSet id="15-05-2025_create-family-members" author="emrek">
