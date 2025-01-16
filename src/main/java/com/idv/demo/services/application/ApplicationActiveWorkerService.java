@@ -5,15 +5,12 @@ import com.idv.demo.entities.FamilyMembersEntity;
 import com.idv.demo.entities.application.ApplicationsActiveWorkerEntity;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationActiveWorkerRequest;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationBaseRequest;
-import com.idv.demo.models.dtos.applicationRegistration.FamilyMemberRequest;
 import com.idv.demo.models.enums.ApplicationStatus;
 import com.idv.demo.repository.ApplicationActiveWorkerRepository;
 import com.idv.demo.repository.FamilyMemberRepository;
 import com.idv.demo.services.LogService;
 import com.idv.demo.services.log.LogConsole;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

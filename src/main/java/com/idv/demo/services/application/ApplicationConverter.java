@@ -41,6 +41,7 @@ public abstract class ApplicationConverter {
                     response.setCountryCode(item.getCountry().getCode());
                     response.setCountryId(item.getCountry().getId());
                     response.setCountryName(item.getCountry().getName());
+                    response.setStatus(item.getStatus());
                     return response;
 
                 })

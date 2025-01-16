@@ -30,6 +30,6 @@ public class ApplicationController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('IK', 'ADMIN')")
     public List<ApplicationGetResponse> getApplications(@RequestParam(required = false) String search) {
-        return this.applicationService.getApplications(search);
+        return this.applicationService.getApplications(ApplicationStatus.PENDING, search);
     }
 }

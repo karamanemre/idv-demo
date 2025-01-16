@@ -3,6 +3,7 @@ package com.idv.demo.models.dtos.applicationRegistration;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.idv.demo.models.enums.ApplicationTypes;
+import com.idv.demo.utils.RegexUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -29,7 +30,7 @@ public class ApplicationBaseRequest {
     private String lastname;
 
     @NotNull(message = "validation.notnull")
-    @Pattern(regexp = "\\d{11}", message = "validation.invalid.identityNumber")
+    @Pattern(regexp = RegexUtil.IDENTITY_NUMBER_REGEX, message = "validation.invalid.identityNumber")
     private String identityNumber;
 
     @NotBlank(message = "validation.notnull")

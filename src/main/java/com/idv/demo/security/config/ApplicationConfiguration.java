@@ -1,8 +1,12 @@
 package com.idv.demo.security.config;
 
+import com.idv.demo.config.ApplicationAuditAware;
 import com.idv.demo.security.repository.UserRepository;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -11,24 +15,31 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@RequiredArgsConstructor
 public class ApplicationConfiguration {
-    private final UserRepository userRepository;
 
-    public ApplicationConfiguration(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository repository;
 
     @Bean
-    UserDetailsService userDetailsService() {
-        return username -> (UserDetails) userRepository.findByEmail(username)
+    public UserDetailsService userDetailsService() {
+        return username -> repository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
-    BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuditorAware<UUID> auditorAware() {
+        return new ApplicationAuditAware();
     }
 
     @Bean
@@ -37,12 +48,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-
-        return authProvider;
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

@@ -3,12 +3,14 @@ package com.idv.demo.services.application;
 import com.idv.demo.entities.application.ApplicationsEntity;
 import com.idv.demo.entities.CountryEntity;
 import com.idv.demo.exception.BadRequestException;
+import com.idv.demo.exception.EntityNotFoundException;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationBaseRequest;
 import com.idv.demo.models.dtos.applicationRegistration.ApplicationGetResponse;
 import com.idv.demo.models.enums.ApplicationStatus;
 import com.idv.demo.models.enums.ApplicationTypes;
 import com.idv.demo.repository.ApplicationRepository;
 import com.idv.demo.services.CountryService;
+import com.idv.demo.services.TranslationService;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,8 +38,13 @@ public class ApplicationService extends ApplicationConverter {
         return this.applicationRepository.findById(id).orElse(null);
     }
 
-    public List<ApplicationGetResponse> getApplications(String search) {
-        List<ApplicationsEntity> entities = this.applicationRepository.findByFilters(ApplicationStatus.PENDING, search);
+    public ApplicationsEntity findByIdOrElseThrow(UUID id) {
+        return this.applicationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(TranslationService.translate("notfound.entity")));
+    }
+
+    public List<ApplicationGetResponse> getApplications(ApplicationStatus status, String search) {
+        List<ApplicationsEntity> entities = this.applicationRepository.findByFilters(status, search);
         return this.toResponse(entities);
     }
 

@@ -1,8 +1,10 @@
 package com.idv.demo.models.dtos.applicationRegistration;
 
 import com.idv.demo.models.enums.FamilyMemberTypes;
+import com.idv.demo.utils.RegexUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,5 +22,6 @@ public class FamilyMemberRequest {
     private String lastname;
 
     @NotBlank(message = "validation.notnull")
+    @Pattern(regexp = RegexUtil.IDENTITY_NUMBER_REGEX, message = "validation.invalid.identityNumber")
     private String identityNumber;
 }
