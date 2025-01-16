@@ -1,71 +1,61 @@
 package com.idv.demo.security.config;
 
-import com.idv.demo.security.jwt.JwtAuthenticationFilter;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfiguration {
-    private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfiguration(
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            AuthenticationProvider authenticationProvider
-    ) {
-        this.authenticationProvider = authenticationProvider;
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+    private final LogoutHandler logoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf()
-                .disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/application").permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .accessDeniedHandler(new CustomAccessDeniedHandler())
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/application").permitAll()
+                        .requestMatchers(WHITE_LIST_URL).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout ->
+                        logout.logoutUrl("/idv/auth/logout")
+                                .addLogoutHandler(logoutHandler)
+                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                );
 
         return http.build();
     }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE"));
-        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration("/**",configuration);
-
-        return source;
-    }
+    private static final String[] WHITE_LIST_URL = {
+            "/auth/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-ui.html"};
 }

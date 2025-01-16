@@ -1,18 +1,19 @@
 package com.idv.demo;
 
-import com.idv.demo.models.dtos.auth.RegisterUserRequest;
 import com.idv.demo.security.entity.UserEntity;
+import com.idv.demo.security.models.RegisterRequest;
+import com.idv.demo.security.models.Roles;
 import com.idv.demo.security.repository.UserRepository;
 import com.idv.demo.security.service.AuthenticationService;
+import java.util.Arrays;
 import java.util.Optional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaAuditing(auditorAwareRef = "auditorConfig")
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class DemoApplication implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -33,9 +34,10 @@ public class DemoApplication implements CommandLineRunner {
         if (user.isPresent()) {
             return;
         }
-        RegisterUserRequest userRequest = new RegisterUserRequest();
+        RegisterRequest userRequest = new RegisterRequest();
         userRequest.setPassword("idv123");
         userRequest.setEmail("emre@idv.com");
-        this.authenticationService.signup(userRequest);
+        userRequest.setRoles(Arrays.asList(Roles.IK));
+        this.authenticationService.register(userRequest);
     }
 }

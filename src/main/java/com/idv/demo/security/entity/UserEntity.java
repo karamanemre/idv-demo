@@ -1,6 +1,7 @@
 package com.idv.demo.security.entity;
 
-import com.idv.demo.utils.StringListConverter;
+import com.idv.demo.security.models.Roles;
+import com.idv.demo.utils.RolesListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -51,14 +52,14 @@ public class UserEntity implements UserDetails {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @Convert(converter = StringListConverter.class)
+    @Convert(converter = RolesListConverter.class)
     @Column(name = "roles")
-    private List<String> roles;
+    private List<Roles> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority(role.toString()))
                 .toList();
     }
 

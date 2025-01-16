@@ -1,10 +1,13 @@
 package com.idv.demo.security.controller;
 
-import com.idv.demo.models.dtos.auth.LoginResponse;
-import com.idv.demo.models.dtos.auth.LoginUserRequest;
-import com.idv.demo.security.entity.UserEntity;
-import com.idv.demo.security.jwt.JwtService;
+import com.idv.demo.security.models.AuthenticationRequest;
+import com.idv.demo.security.models.AuthenticationResponse;
 import com.idv.demo.security.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,29 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/auth")
 @RestController
+@RequiredArgsConstructor
 public class AuthenticationController {
-    private final JwtService jwtService;
-    private final AuthenticationService authenticationService;
 
+    private final AuthenticationService service;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
-        this.jwtService = jwtService;
-        this.authenticationService = authenticationService;
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+        return ResponseEntity.ok(service.authenticate(request));
     }
 
-    @PostMapping("/login")
-    public LoginResponse authenticate(@RequestBody LoginUserRequest loginUserDto) {
-        UserEntity authenticatedUser = authenticationService.authenticate(loginUserDto);
-
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-
-        LoginResponse loginResponse = LoginResponse
-                .builder()
-                .username(authenticatedUser.getUsername())
-                .token(jwtToken)
-                .expiresIn(jwtService.getExpirationTime())
-                .build();
-
-        return loginResponse;
+    @PostMapping("/refresh-token")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        service.refreshToken(request, response);
     }
 }
